@@ -1,0 +1,31 @@
+{
+  "name": "node-cli-gen",
+  "version": "0.0.1",
+  "description": "",
+  "main": "./dist/cli.js",
+  "scripts": {
+    "prepack": "tsc -b"
+  },
+  "author": "Syler",
+  "license": "MIT",
+  "bin": {
+    "ncg": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TheRealSyler/node-cli-gen"
+  },
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "typescript": "^3.6.3"
+  },
+  "devDependencies": {
+    "@types/node": "^12.7.7"
+  },
+  "keywords": [
+    "cli"
+  ]
+}
