@@ -59,7 +59,9 @@ tsconfig.tsbuildinfo
   "version": "0.0.1",
   "main": "./dist/cli.js",
   "scripts": {
-    "prepack": "tsc -b"
+    "prepack": "tsc -b",
+    "start": "yarn && npm link && tsc -w",
+    "build": "yarn && npm link && tsc -b"
   },
   "author": "Syler",
   "license": "MIT",
