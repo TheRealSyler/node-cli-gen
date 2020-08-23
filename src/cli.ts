@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { failure } from './messages';
-import { writeFileSync } from 'fs';
+
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { exec } from 'child_process';
 
 class Start {
@@ -15,13 +15,21 @@ class Start {
   }
   private async run() {
     const name = this.args[0];
+    const cliName = this.args[1] || name;
+
     if (this.args[0]) {
-      exec(`mkdir ${name}`);
-      exec(`mkdir ${name}/src`);
-      writeFileSync(`./${name}/README.md`, `## ${name}`);
-      writeFileSync(`./${name}/todo`, '');
+      if (existsSync(`./${name}`)) {
+        console.log(`\x1b[1;38;2;255;0;0m> directory ${name} already exists.\x1b[m`);
+        return;
+      }
+      const dir = (path: string) => `./${name}/${path}`;
+      mkdirSync(`./${name}`);
+      mkdirSync(dir('src'));
+
+      writeFileSync(dir('README.md'), `## ${name}`);
+
       writeFileSync(
-        `./${name}/.gitignore`,
+        dir('.gitignore'),
         `node_modules
 dist
 .vscode
@@ -29,7 +37,7 @@ tsconfig.tsbuildinfo
 `
       );
       writeFileSync(
-        `./${name}/tsconfig.json`,
+        dir('tsconfig.json'),
         `{
   "compilerOptions": {
     "baseUrl": ".",
@@ -45,11 +53,10 @@ tsconfig.tsbuildinfo
 }`
       );
       writeFileSync(
-        `./${name}/package.json`,
+        dir('package.json'),
         `{
   "name": "${name}",
   "version": "0.0.1",
-  "description": "",
   "main": "./dist/cli.js",
   "scripts": {
     "prepack": "tsc -b"
@@ -57,7 +64,7 @@ tsconfig.tsbuildinfo
   "author": "Syler",
   "license": "MIT",
   "bin": {
-    "CLI_COMMAND": "./dist/cli.js"
+    "${cliName}": "./dist/cli.js"
   },
   "files": [
     "dist"
@@ -65,20 +72,13 @@ tsconfig.tsbuildinfo
   "repository": {
     "type": "git",
     "url": "https://github.com/TheRealSyler/${name}"
-  },
-  "dependencies": {
-    "chalk": "^2.4.2",
-    "typescript": "^3.6.3"
-  },
-  "devDependencies": {
-    "@types/node": "^12.7.7"
   }
 }
-      
-      `
+`
       );
+
       writeFileSync(
-        `./${name}/src/cli.ts`,
+        dir('src/cli.ts'),
         `#!/usr/bin/env node
 
 class Start {
@@ -97,29 +97,15 @@ class Start {
 }
 new Start();`
       );
-      writeFileSync(
-        `./${name}/src/messages.ts`,
-        `import chalk from 'chalk';
 
-export const successFile = (filePath: string) => {
-  console.log(chalk.green.bold(\`Done! File created at \${filePath}\`));
-};
-export const success = (message: any) => {
-  console.log(chalk.green.bold(message));
-};
-export const failure = (message: string) => {
-  console.log(chalk.red.bold(message));
-};
-export const info = (message: string) => {
-  console.log(chalk.yellow.bold(message));
-};
-`
-      );
+      const devPackages = ['typescript', '@types/node'];
 
       exec(`cd ${name} && git init`);
-      exec(`cd ${name} && npm i`);
+      exec(`cd ${name} && yarn add -D ${devPackages.join(' ')}`);
+
+      console.log(`\x1b[1;38;2;0;255;0m> successfully created ${name}.\x1b[m`);
     } else {
-      failure('argument NAME is needed.');
+      console.log('\x1b[1;38;2;255;0;0m> argument NAME is needed.\x1b[m');
     }
   }
 }
